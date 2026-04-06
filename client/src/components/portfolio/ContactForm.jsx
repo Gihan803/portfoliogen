@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { portfolioAPI } from '../../services/api';
 
 function ContactForm({ username }) {
     const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -9,24 +10,16 @@ function ContactForm({ username }) {
         setStatus('sending');
 
         try {
-            const res = await fetch(`/api/contact/${username}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: form.name,
-                    email: form.email,
-                    message: form.message,
-                }),
+            await portfolioAPI.contact(username, {
+                name: form.name,
+                email: form.email,
+                message: form.message,
             });
 
-            const data = await res.json();
-            if (data.success) {
-                setStatus('sent');
-                setForm({ name: '', email: '', message: '' });
-            } else {
-                setStatus('error');
-            }
-        } catch {
+            setStatus('sent');
+            setForm({ name: '', email: '', message: '' });
+        } catch (error) {
+            console.error('❌ Contact Error:', error);
             setStatus('error');
         }
     };

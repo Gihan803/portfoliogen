@@ -55,6 +55,7 @@ export const portfolioAPI = {
   get: (username) => api.get(`/portfolio/${username}`),
   update: (username, data) => api.put(`/portfolio/${username}`, data),
   delete: (username) => api.delete(`/portfolio/${username}`),
+  contact: (username, data) => api.post(`/contact/${username}`, data),
 };
 
 // ==================== Upload API ====================
