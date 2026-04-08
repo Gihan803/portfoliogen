@@ -3,6 +3,10 @@ const router = express.Router();
 const UserPortfolio = require('../models/UserPortfolio');
 
 router.post('/:username', async (req, res) => {
+    console.log('ENV CHECK:', {
+        senderEmail: process.env.BREVO_SENDER_EMAIL,
+        apiKeyExists: !!process.env.BREVO_API_KEY,
+    });
     const { name, email, message } = req.body;
     const { username } = req.params;
 
