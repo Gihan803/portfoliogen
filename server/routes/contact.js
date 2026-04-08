@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const UserPortfolio = require('../models/UserPortfolio');
-const { Resend } = require('resend');
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+const nodemailer = require('nodemailer');
 
 // @route   POST /api/contact/:username
 // @desc    Send contact email to portfolio owner
@@ -28,29 +26,42 @@ router.post('/:username', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Portfolio owner has no contact email set' });
         }
 
-        // 2. Send email via Resend
-        const { data, error } = await resend.emails.send({
-            from: 'PortfolioGen <onboarding@resend.dev>',
-            to: ownerEmail,
-            subject: `New Message from ${name} via PortfolioGen`,
-            html: `
-                <h3>New Contact Message</h3>
-                <p><strong>From:</strong> ${name} (${email})</p>
-                <p><strong>Portfolio Username:</strong> ${username}</p>
-                <p><strong>Message:</strong></p>
-                <p>${message}</p>
-            `,
+        // 2. Configure Nodemailer Transporter (Gmail)
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
         });
 
-        if (error) {
-            console.error('❌ Resend Error:', error);
-            return res.status(400).json({ success: false, error });
-        }
+        // 3. Prepare Email Options
+        const mailOptions = {
+            from: `"PortfolioGen" <${process.env.EMAIL_USER}>`,
+            to: ownerEmail,
+            replyTo: email,
+            subject: `New Message from ${name} via PortfolioGen`,
+            html: `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <h2 style="color: #4f46e5;">New Contact Message</h2>
+                    <p><strong>From:</strong> ${name} &lt;${email}&gt;</p>
+                    <p><strong>Portfolio Username:</strong> ${username}</p>
+                    <hr style="border: 0; border-top: 1px solid #eee;" />
+                    <p><strong>Message:</strong></p>
+                    <p style="background: #f9fafb; padding: 15px; border-radius: 5px;">${message}</p>
+                    <hr style="border: 0; border-top: 1px solid #eee;" />
+                    <p style="font-size: 0.8em; color: #666;">This message was sent via your PortfolioGen contact form.</p>
+                </div>
+            `
+        };
 
-        res.status(200).json({ success: true, data });
+        // 4. Send email
+        await transporter.sendMail(mailOptions);
+
+        res.status(200).json({ success: true, message: 'Email sent successfully' });
     } catch (error) {
-        console.error('❌ Server Error:', error);
-        res.status(500).json({ success: false, message: 'Internal server error' });
+        console.error('❌ Nodemailer Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to send email. please try again later.' });
     }
 });
 
