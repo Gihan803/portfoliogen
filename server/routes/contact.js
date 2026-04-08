@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const UserPortfolio = require('../models/UserPortfolio');
-const { Resend } = require('resend');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const { BrevoClient } = require('@getbrevo/brevo');
+
+// Initialize the Brevo Client
+const client = new BrevoClient({ apiKey: process.env.BREVO_API_KEY });
 
 // @route   POST /api/contact/:username
 // @desc    Send contact email to portfolio owner
@@ -28,30 +30,27 @@ router.post('/:username', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Portfolio owner has no contact email set' });
         }
 
-        // 2. Send email via Resend
-        const { data, error } = await resend.emails.send({
-            from: 'PortfolioGen <onboarding@resend.dev>',
-            to: ownerEmail,
+        // 2. Send email via Brevo
+        await client.transactionalEmails.sendTransacEmail({
+            sender: { email: process.env.BREVO_SENDER_EMAIL, name: 'PortfolioGen' },
+            to: [{ email: ownerEmail }],
+            replyTo: { email: email, name: name }, // visitor reply කරන්ට
             subject: `New Message from ${name} via PortfolioGen`,
-            html: `
+            htmlContent: `
                 <h3>New Contact Message</h3>
                 <p><strong>From:</strong> ${name} (${email})</p>
-                <p><strong>Portfolio Username:</strong> ${username}</p>
+                <p><strong>Portfolio:</strong> ${username}</p>
                 <p><strong>Message:</strong></p>
                 <p>${message}</p>
             `,
         });
 
-        if (error) {
-            console.error('❌ Resend Error:', error);
-            return res.status(400).json({ success: false, error });
-        }
+        res.status(200).json({ success: true, message: 'Email sent successfully' });
 
-        res.status(200).json({ success: true, data });
     } catch (error) {
         console.error('❌ Server Error:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
 
-module.exports = router;
+module.exports = router;
