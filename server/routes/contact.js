@@ -26,7 +26,7 @@ router.post('/:username', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Portfolio owner has no contact email set' });
         }
 
-        // 2. Configure Nodemailer Transporter (Explicit Gmail SMTP)
+        // 2. Configure Nodemailer Transporter (Explicit Gmail SMTP with IPv4 Force)
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             port: 465,
@@ -34,6 +34,13 @@ router.post('/:username', async (req, res) => {
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
+            },
+            family: 4,
+            connectionTimeout: 10000,
+            greetingTimeout: 10000,
+            socketTimeout: 10000,
+            tls: {
+                rejectUnauthorized: false
             }
         });
 
@@ -75,10 +82,10 @@ router.post('/:username', async (req, res) => {
         res.status(200).json({ success: true, message: 'Email sent successfully' });
     } catch (error) {
         console.error('❌ Nodemailer Error:', error);
-        res.status(500).json({ 
-            success: false, 
+        res.status(500).json({
+            success: false,
             message: 'Failed to send email.',
-            error: error.message // Always show error for debugging
+            error: error.message
         });
     }
 });
