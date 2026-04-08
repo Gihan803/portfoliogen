@@ -37,6 +37,18 @@ router.post('/:username', async (req, res) => {
             }
         });
 
+        // Verify connection configuration
+        try {
+            await transporter.verify();
+        } catch (verifyError) {
+            console.error('❌ Transporter Verification Failed:', verifyError);
+            return res.status(500).json({
+                success: false,
+                message: 'Mail server connection failed.',
+                error: verifyError.message
+            });
+        }
+
         // 3. Prepare Email Options
         const mailOptions = {
             from: `"PortfolioGen" <${process.env.EMAIL_USER}>`,
@@ -66,7 +78,7 @@ router.post('/:username', async (req, res) => {
         res.status(500).json({ 
             success: false, 
             message: 'Failed to send email.',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined 
+            error: error.message // Always show error for debugging
         });
     }
 });
