@@ -65,12 +65,14 @@ function Navigation() {
 
                 {/* User Menu */}
                 <div className="flex items-center gap-3 ml-4 pl-4 border-l border-white/10">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-accent-400 flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">
-                      {user?.fullName?.charAt(0)?.toUpperCase() || 'U'}
-                    </span>
-                  </div>
-                  <span className="text-sm text-surface-200">{user?.fullName}</span>
+                  <Link to="/profile" className="flex items-center gap-3 no-underline group">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-accent-400 flex items-center justify-center transition-transform duration-200 group-hover:scale-110">
+                      <span className="text-white text-xs font-bold">
+                        {user?.fullName?.charAt(0)?.toUpperCase() || 'U'}
+                      </span>
+                    </div>
+                    <span className="text-sm text-surface-200 group-hover:text-white transition-colors duration-200">{user?.fullName}</span>
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="text-sm text-surface-700 hover:text-red-400 transition-colors duration-200 cursor-pointer bg-transparent border-none font-medium"
@@ -137,17 +139,21 @@ function Navigation() {
                 My Portfolio
               </Link>
               <div className="pt-3 border-t border-white/10 mt-1">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-accent-400 flex items-center justify-center">
+                <Link 
+                  to="/profile" 
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 mb-3 no-underline group"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-accent-400 flex items-center justify-center transition-transform duration-200 group-active:scale-95">
                     <span className="text-white text-sm font-bold">
                       {user?.fullName?.charAt(0)?.toUpperCase() || 'U'}
                     </span>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white m-0">{user?.fullName}</p>
+                    <p className="text-sm font-medium text-white m-0 group-hover:text-primary-400 transition-colors">{user?.fullName}</p>
                     <p className="text-xs text-surface-400 m-0">@{user?.username}</p>
                   </div>
-                </div>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:text-white hover:bg-red-500/15 border border-transparent hover:border-red-500/20 bg-transparent cursor-pointer transition-all duration-200"

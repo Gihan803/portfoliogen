@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import CreatePortfolio from './pages/CreatePortfolio';
 import PublicPortfolio from './pages/PublicPortfolio';
 import EditPortfolio from './pages/EditPortfolio';
+import EditProfile from './pages/EditProfile';
 
 function App() {
   return (
@@ -36,6 +37,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <EditPortfolio />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <EditProfile />
                   </ProtectedRoute>
                 }
               />

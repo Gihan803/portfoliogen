@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const UserPortfolio = require('../models/UserPortfolio');
 const jwt = require('jsonwebtoken');
 
 const generateToken = (userId) => {
@@ -124,6 +125,85 @@ exports.getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     res.json({ user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { fullName, username, email, currentPassword, newPassword } = req.body;
+
+    if (!currentPassword) {
+      return res.status(400).json({ error: 'Current password is required to save changes' });
+    }
+
+    const user = await User.findById(req.user.id).select('+password');
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const oldUsername = user.username;
+
+    // Verify current password
+    const isPasswordValid = await user.matchPassword(currentPassword);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Incorrect current password' });
+    }
+
+    // Update fields if provided
+    if (fullName) user.fullName = fullName;
+    
+    if (username && username !== user.username) {
+      const usernameExists = await User.findOne({ username });
+      if (usernameExists) {
+        return res.status(409).json({ error: 'Username already taken' });
+      }
+      user.username = username;
+    }
+
+    if (email && email !== user.email) {
+      const emailExists = await User.findOne({ email });
+      if (emailExists) {
+        return res.status(409).json({ error: 'Email already registered' });
+      }
+      user.email = email;
+    }
+
+    // Update password if new one is provided
+    if (newPassword) {
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: 'New password must be at least 6 characters' });
+      }
+      user.password = newPassword;
+    }
+
+    user.updatedAt = Date.now();
+    await user.save();
+
+    // Sync with UserPortfolio if username or fullName changed
+    if (username || fullName) {
+      await UserPortfolio.findOneAndUpdate(
+        { $or: [{ user: user._id }, { username: oldUsername }] },
+        { 
+          username: user.username,
+          fullName: user.fullName,
+          updatedAt: Date.now()
+        }
+      );
+    }
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        fullName: user.fullName
+      }
+    });
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

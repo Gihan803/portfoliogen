@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { loginUser, registerUser, logoutUser, fetchCurrentUser, isAuthenticated } from '../services/authService';
+import { loginUser, registerUser, logoutUser, fetchCurrentUser, isAuthenticated, updateUserProfile } from '../services/authService';
 
 const AuthContext = createContext(null);
 
@@ -32,6 +32,23 @@ export function AuthProvider({ children }) {
     setLoading(true);
 
     const result = await registerUser(formData);
+
+    if (result.success) {
+      setUser(result.user);
+    } else {
+      setError(result.error);
+    }
+
+    setLoading(false);
+    return result;
+  }, []);
+
+  // Update Profile
+  const updateProfile = useCallback(async (formData) => {
+    setError(null);
+    setLoading(true);
+
+    const result = await updateUserProfile(formData);
 
     if (result.success) {
       setUser(result.user);
@@ -77,6 +94,7 @@ export function AuthProvider({ children }) {
     register,
     login,
     logout,
+    updateProfile,
     clearError,
   };
 

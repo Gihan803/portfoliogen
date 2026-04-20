@@ -20,6 +20,7 @@ exports.createPortfolio = async (req, res) => {
     }
 
     const portfolio = new UserPortfolio({
+      user: req.user.id,
       username,
       fullName,
       title,
