@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const UserPortfolioSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    unique: true
+  },
   username: {
     type: String,
     required: [true, 'Username is required'],

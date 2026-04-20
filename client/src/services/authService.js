@@ -81,3 +81,19 @@ export const fetchCurrentUser = async () => {
 export const isAuthenticated = () => {
   return !!localStorage.getItem('token');
 };
+
+// Update user profile
+export const updateUserProfile = async (formData) => {
+  try {
+    const response = await authAPI.updateProfile(formData);
+    const { user } = response.data;
+
+    // Update persisted user state
+    localStorage.setItem('user', JSON.stringify(user));
+
+    return { success: true, user };
+  } catch (error) {
+    const message = error.response?.data?.error || 'Profile update failed. Please try again.';
+    return { success: false, error: message };
+  }
+};
