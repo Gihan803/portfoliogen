@@ -71,6 +71,7 @@ function EditProfile() {
 
     if (result.success) {
       toast.success('Profile updated successfully!');
+      navigate('/create');
       setFormData(prev => ({
         ...prev,
         currentPassword: '',
