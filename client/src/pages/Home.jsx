@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Footer from '../components/Footer';
+import Testimonials from '../components/Testimonials';
 
 function Home() {
   const { isLoggedIn } = useAuth();
@@ -78,6 +79,9 @@ function Home() {
           </div>
         ))}
       </section>
+
+      {/* Testimonials Section */}
+      <Testimonials />
 
       {/* Spacer */}
       <div className="h-24 w-full" />
