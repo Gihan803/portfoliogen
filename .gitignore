@@ -4,14 +4,11 @@ dist/
 build/
 
 # Environment Variables
-.env
-.env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
 # IDEs and Editors
-.vscode/
 .idea/
 *.swp
 *.swo
@@ -26,3 +23,4 @@ yarn-debug.log*
 yarn-error.log*
 logs/
 *.log
+config.bat
