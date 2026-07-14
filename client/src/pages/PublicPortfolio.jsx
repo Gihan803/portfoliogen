@@ -46,7 +46,6 @@ function PublicPortfolio() {
 
   if (error) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-6">
-      <div className="text-6xl">😔</div>
       <h2 className="text-2xl font-bold text-white">{error}</h2>
       <p className="text-surface-200">The portfolio for <span className="text-primary-400">@{username}</span> doesn't exist yet.</p>
       {isOwner && <Link to="/create" className="btn-primary no-underline px-6 py-3">Create Your Portfolio</Link>}
